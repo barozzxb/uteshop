@@ -13,5 +13,10 @@ export const sendOTPEmail = async (req, res) => {
 }
 
 export const verifyOTP = async (req, res) => {
-    
+    const {email, otp} = req.body;
+    const result = OTPService.verifyOTP(email, otp);
+    if (!result.success) {
+        return res.status(400).json({message: result.message});
+    }
+    res.status(200).json({message: result.message});
 }
