@@ -2,12 +2,16 @@
 
 import Link from 'next/link';
 import { useState } from 'react';
+import { register } from '@/services/authService';
+
+import { toast } from 'react-toastify';
 
 const RegisterPage = () => {
     const [showPassword, setShowPassword] = useState(false);
     const [showConfirmPassword, setShowConfirmPassword] = useState(false);
     const [formData, setFormData] = useState({
-        fullName: '',
+        firstname: '',
+        lastname: '',
         email: '',
         password: '',
         confirmPassword: '',
@@ -16,7 +20,8 @@ const RegisterPage = () => {
 
     const validateForm = () => {
         const newErrors: Record<string, string> = {};
-        if (!formData.fullName.trim()) newErrors.fullName = 'Full name is required';
+        if (!formData.firstname.trim()) newErrors.fullName = 'First name is required';
+        if (!formData.lastname.trim()) newErrors.fullName = 'Last name is required';
         if (!formData.email.includes('@')) newErrors.email = 'Valid email is required';
         if (formData.password.length < 6) newErrors.password = 'Password must be at least 6 characters';
         if (formData.password !== formData.confirmPassword) newErrors.confirmPassword = 'Passwords do not match';
@@ -24,11 +29,22 @@ const RegisterPage = () => {
         return Object.keys(newErrors).length === 0;
     };
 
-    const handleSubmit = (e: React.FormEvent) => {
+    const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
         if (validateForm()) {
             console.log('Register:', formData);
-            // Handle registration logic here
+            try {
+                const {success, message} = await register(formData.email, formData.firstname, formData.lastname, formData.password)
+                if (!success) {
+                    toast.error(message);
+                    return;
+                }
+                toast.success(message);
+            } catch (error){
+                console.log(error);
+            }
+        } else {
+            return;
         }
     };
 
@@ -51,17 +67,31 @@ const RegisterPage = () => {
                     </div>
                     <form onSubmit={handleSubmit} className="space-y-5">
                         <div>
-                            <label className="block text-sm font-semibold text-gray-700 mb-2">Full Name <span className='text-red-500'>*</span></label>
+                            <label className="block text-sm font-semibold text-gray-700 mb-2">First Name <span className='text-red-500'>*</span></label>
                             <input
                                 type="text"
-                                name="fullName"
-                                value={formData.fullName}
+                                name="firstname"
+                                value={formData.firstname}
                                 onChange={handleChange}
-                                placeholder="John Doe"
+                                placeholder="John"
                                 className={`w-full px-4 py-3 rounded-lg border transition-all focus:outline-none focus:ring-2 focus:ring-orange-800 focus:border-transparent ${errors.fullName ? 'border-red-500 bg-red-50' : 'border-gray-300 bg-gray-50 hover:bg-white'
                                     }`}
                             />
-                            {errors.fullName && <p className="text-red-500 text-xs mt-1">{errors.fullName}</p>}
+                            {errors.firstname && <p className="text-red-500 text-xs mt-1">{errors.firstname}</p>}
+                        </div>
+
+                        <div>
+                            <label className="block text-sm font-semibold text-gray-700 mb-2">Last Name <span className='text-red-500'>*</span></label>
+                            <input
+                                type="text"
+                                name="lastname"
+                                value={formData.lastname}
+                                onChange={handleChange}
+                                placeholder="Doe"
+                                className={`w-full px-4 py-3 rounded-lg border transition-all focus:outline-none focus:ring-2 focus:ring-orange-800 focus:border-transparent ${errors.fullName ? 'border-red-500 bg-red-50' : 'border-gray-300 bg-gray-50 hover:bg-white'
+                                    }`}
+                            />
+                            {errors.lastname && <p className="text-red-500 text-xs mt-1">{errors.lastname}</p>}
                         </div>
 
                         <div>
