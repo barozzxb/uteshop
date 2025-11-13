@@ -34,12 +34,13 @@ const RegisterPage = () => {
         if (validateForm()) {
             console.log('Register:', formData);
             try {
-                const {success, message} = await register(formData.email, formData.firstname, formData.lastname, formData.password)
+                const {success, data} = await register(formData.email, formData.firstname, formData.lastname, formData.password)
                 if (!success) {
-                    toast.error(message);
+                    toast.error(data.message);
                     return;
                 }
-                toast.success(message);
+                toast.success(data.message);
+                window.location.href = '/verify-otp';
             } catch (error){
                 console.log(error);
             }

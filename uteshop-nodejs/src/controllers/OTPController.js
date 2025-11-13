@@ -7,16 +7,16 @@ export const sendOTPEmail = async (req, res) => {
     OTPService.storeOTP(email, otp);
     const result = await sendMail('otpTemplate', email, 'UTEShop OTP Verification', otp);
     if (!result.success) {
-        return res.status(500).json({ message: 'Failed to send OTP email' });
+        return res.status(500).json(result);
     }
-    res.status(200).json({ message: 'OTP email sent successfully' });
+    res.status(200).json(result);
 }
 
 export const verifyOTP = async (req, res) => {
     const {email, otp} = req.body;
     const result = OTPService.verifyOTP(email, otp);
     if (!result.success) {
-        return res.status(400).json({message: result.message});
+        return res.status(400).json(result);
     }
-    res.status(200).json({message: result.message});
+    res.status(200).json(result);
 }

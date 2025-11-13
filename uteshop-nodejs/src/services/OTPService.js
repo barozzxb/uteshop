@@ -17,24 +17,24 @@ const OTPService = {
         const record = OTPStore.get(email);
         console.log(record);
         console.log(OTPStore);
-        if (!record) return {success: false, message: "OTP expired or not existed, try requesting another OTP"};;
+        if (!record) return {success: false, message: "OTP expired or not existed, try requesting another OTP", data: null};;
         if (record.expiry < Date.now()) {
             OTPStore.delete(email);
-            return {success: false, message: "OTP expired"};
+            return {success: false, message: "OTP expired", data: null};
         }
 
         if (record.otp.attemptsLeft <= 0) {
             OTPStore.delete(email);
-            return {success: false, message: "Maximum attempts of this OTP reached"};
+            return {success: false, message: "Maximum attempts of this OTP reached", data: null};
         }
 
         if (otp !== record.otp) {
             record.otp.attemptsLeft--;
-            return {success: false, message: `{Wrong OTP, try again. You still have ${record.otp.attemptsLeft} attempts left}`}
+            return {success: false, message: `{Wrong OTP, try again. You still have ${record.otp.attemptsLeft} attempts left}`, data: null}
         }
         
         OTPStore.delete(email);
-        return {success: true, message: "Verify successfully"};
+        return {success: true, message: "Verify successfully", data: null};
     }
 }
 

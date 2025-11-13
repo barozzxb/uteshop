@@ -1,21 +1,58 @@
 'use client';
 
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import Link from "next/dist/client/link";
+import { sendOTP, verifyOTP } from "@/services/otpService";
+import { toast } from "react-toastify";
+import { activeAccount } from "@/services/authService";
 
 const VerifyOtpPage = () => {
     const [formData, setFormData] =  useState({
         otp: '',
     });
 
+    const validateForm = () => {
+        const newErrors: Record<string, string> = {};
+        if (!formData.otp.trim()) newErrors.otp = 'Please input OTP';
+        setErrors(newErrors);
+        return Object.keys(newErrors).length === 0;
+    };
     const [errors, setErrors] = useState<{ [key: string]: string }>({});
 
-
+    useEffect (() => {
+        const send = async () =>{
+            const res = await sendOTP();
+            if (res.success) {
+                toast.info(res.data.message);
+            } else {
+                toast.error(res.data.message);
+            }
+        }
+        send();
+    }, [])
 
     const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const { name, value } = e.target;
         setFormData({ ...formData, [name]: value });
     };
+
+    const handleSubmit = async (e: React.FormEvent) => {
+        e.preventDefault();
+        if (validateForm()) {
+            try {
+                const res = await verifyOTP(formData.otp);
+                if (res.success) {
+                    toast.success(res.data.message);
+                    window.location.href = '/login';
+                } else {
+                    toast.error(res.data.message)
+                    return;
+                }
+            } catch (error) {
+                console.log(error);
+            }
+        }
+    }
 
     return (
         <div className="min-h-screen w-full bg-linear-to-br from-orange-50 via-yellow-200 to-red-200 flex items-center justify-center px-4 py-12">
@@ -28,7 +65,7 @@ const VerifyOtpPage = () => {
                         </h1>
                         <p className="text-gray-600">Enter the OTP sent to your email</p>
                     </div>
-                    <form onSubmit={() => {}} className="space-y-5">
+                    <form onSubmit={handleSubmit} className="space-y-5">
                         <div>
                             <label className="block text-sm font-semibold text-gray-700 mb-2">Enter OTP<span className='text-red-500'>*</span></label>
                             <input
