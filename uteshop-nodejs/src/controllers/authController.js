@@ -1,19 +1,21 @@
 const User = require("../models/User");
-const crypto = require("crypto"); // Có sẵn trong Node.js
+const crypto = require("crypto");
 const nodemailer = require("nodemailer");
 
-// Cấu hình gửi mail (Nên đưa vào file config riêng, nhưng viết ở đây cho gọn)
+const jwt = require("jsonwebtoken");
+const bcrypt = require("bcryptjs");
+
 const sendEmail = async (options) => {
   const transporter = nodemailer.createTransport({
-    service: "Gmail", // Hoặc cấu hình SMTP của host khác
+    service: "Gmail",
     auth: {
-      user: process.env.EMAIL_USERNAME, // Email của bạn trong .env
-      pass: process.env.EMAIL_PASSWORD, // App Password trong .env
+      user: process.env.EMAIL_USERNAME,
+      pass: process.env.EMAIL_PASSWORD,
     },
   });
 
   const mailOptions = {
-    from: '"UteShop Support" <noreply@uteshop.com>',
+    from: '"UTE-Shop Support" <noreply@uteshop.com>',
     to: options.email,
     subject: options.subject,
     text: options.message,
@@ -22,7 +24,38 @@ const sendEmail = async (options) => {
   await transporter.sendMail(mailOptions);
 };
 
-// API 1: Quên mật khẩu
+exports.login = async (req, res) => {
+  try {
+    const { email, password } = req.body;
+
+    const user = await User.findOne({ email }).select("+password");
+
+    if (!user) return res.status(404).json({ message: "Email không tồn tại" });
+
+    const isMatch = await user.matchPassword(password);
+
+    if (!isMatch) {
+      return res.status(400).json({ message: "Sai mật khẩu" });
+    }
+
+    const token = jwt.sign(
+      { id: user._id, role: user.role },
+      process.env.JWT_SECRET || "secret_tam_thoi",
+      { expiresIn: "1d" }
+    );
+
+    user.password = undefined;
+
+    res.status(200).json({
+      status: "success",
+      token,
+      data: { user },
+    });
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
+
 exports.forgotPassword = async (req, res) => {
   try {
     const user = await User.findOne({ email: req.body.email });
@@ -32,20 +65,16 @@ exports.forgotPassword = async (req, res) => {
         .json({ message: "Không tìm thấy email này trong hệ thống." });
     }
 
-    // Tạo token ngẫu nhiên
     const resetToken = crypto.randomBytes(20).toString("hex");
 
-    // Hash token để lưu vào DB (bảo mật hơn lưu text trần)
     user.resetPasswordToken = crypto
       .createHash("sha256")
       .update(resetToken)
       .digest("hex");
-    // Token hết hạn sau 10 phút
     user.resetPasswordExpire = Date.now() + 10 * 60 * 1000;
 
     await user.save({ validateBeforeSave: false });
 
-    // Tạo link gửi về client (Frontend port 3000)
     const resetUrl = `${process.env.CLIENT_URL}/reset-password/${resetToken}`;
 
     const message = `Bạn vừa yêu cầu đặt lại mật khẩu. Vui lòng click vào link sau:\n\n${resetUrl}\n\nLink này sẽ hết hạn sau 10 phút.`;
@@ -53,7 +82,7 @@ exports.forgotPassword = async (req, res) => {
     try {
       await sendEmail({
         email: user.email,
-        subject: "Đặt lại mật khẩu UteShop",
+        subject: "Đặt lại mật khẩu UTE-Shop",
         message,
       });
 
@@ -73,10 +102,8 @@ exports.forgotPassword = async (req, res) => {
   }
 };
 
-// API 2: Đặt lại mật khẩu
 exports.resetPassword = async (req, res) => {
   try {
-    // Hash token từ URL để so sánh với DB
     const hashedToken = crypto
       .createHash("sha256")
       .update(req.params.token)
@@ -84,7 +111,7 @@ exports.resetPassword = async (req, res) => {
 
     const user = await User.findOne({
       resetPasswordToken: hashedToken,
-      resetPasswordExpire: { $gt: Date.now() }, // Kiểm tra xem còn hạn không
+      resetPasswordExpire: { $gt: Date.now() },
     });
 
     if (!user) {
@@ -93,8 +120,6 @@ exports.resetPassword = async (req, res) => {
         .json({ message: "Token không hợp lệ hoặc đã hết hạn." });
     }
 
-    // Đặt pass mới (Lưu ý: Ở thực tế bạn cần hash password này bằng bcrypt trước khi lưu)
-    // Ví dụ: user.password = await bcrypt.hash(req.body.password, 12);
     user.password = req.body.password;
 
     user.resetPasswordToken = undefined;
@@ -106,5 +131,45 @@ exports.resetPassword = async (req, res) => {
       .json({ status: "success", message: "Đổi mật khẩu thành công!" });
   } catch (error) {
     res.status(500).json({ message: error.message });
+  }
+};
+
+exports.updateProfile = async (req, res) => {
+  try {
+    if (!req.user || !req.user.id) {
+      return res.status(401).json({ message: "Bạn chưa đăng nhập!" });
+    }
+    const { name, phone } = req.body;
+    const userId = req.user.id;
+
+    let updateData = {
+      name: name,
+      phone: phone,
+    };
+
+    if (req.file) {
+      const avatarUrl = `${req.protocol}://${req.get("host")}/uploads/${
+        req.file.filename
+      }`;
+      updateData.avatarUrl = avatarUrl;
+    }
+
+    const updatedUser = await User.findByIdAndUpdate(userId, updateData, {
+      new: true,
+      runValidators: true,
+    });
+
+    if (!updatedUser) {
+      return res.status(404).json({ message: "User không tồn tại" });
+    }
+
+    res.status(200).json({
+      message: "Cập nhật hồ sơ thành công!",
+      success: true,
+      data: updatedUser,
+    });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: "Lỗi server" });
   }
 };

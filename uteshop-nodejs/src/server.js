@@ -1,6 +1,8 @@
 const express = require("express");
 const cors = require("cors");
 const mongoose = require("mongoose");
+const path = require("path");
+const fs = require("fs");
 require("dotenv").config();
 
 const authRoutes = require("./routes/authRoutes");
@@ -16,7 +18,14 @@ app.use(
 
 app.use(express.json());
 
-//ket noi database
+const uploadDir = path.join(process.cwd(), "uploads");
+
+if (!fs.existsSync(uploadDir)) {
+  fs.mkdirSync(uploadDir, { recursive: true });
+}
+
+app.use("/uploads", express.static(uploadDir));
+
 const MONGO_URI = process.env.MONGO_URI || "mongodb://localhost:27017/uteshop";
 
 mongoose

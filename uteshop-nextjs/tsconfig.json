@@ -31,7 +31,9 @@
     "**/*.mts",
     "app/(auth)/forgot-password/page.jsx",
     "services/authService.js",
-    "app/layout.jsx"
+    "app/layout.jsx",
+    "app/page.jsx",
+    "app/profile/page.jsx"
   ],
   "exclude": ["node_modules"]
 }
