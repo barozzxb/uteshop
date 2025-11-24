@@ -3,13 +3,13 @@ import AccountDetail from '../models/AccountDetail.js';
 import bcrypt from 'bcrypt';
 
 class AccountService {
-  async createAccount(email, firstname, lastname, password) {
+  async createAccount(email, password) {
     const existingAccount = await Account.findOne({ email });
     if (existingAccount) {
       return { success: false, message: 'Email already in use', data: null };
     }
     const hashedPassword = await bcrypt.hash(password, 10);
-    const newAccount = await Account.create({ email, firstname, lastname, password: hashedPassword });
+    const newAccount = await Account.create({ email, password: hashedPassword });
     const accDetail = new AccountDetail({ account: newAccount._id });
     await accDetail.save();
     newAccount.accDetail = accDetail._id;

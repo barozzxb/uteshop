@@ -4,8 +4,8 @@ const accountService = new AccountService();
 
 export const register = async (req, res) => {
     try {
-        const { email, firstname, lastname, password } = req.body;
-        const result = await accountService.createAccount(email, firstname, lastname, password);
+        const { email, password } = req.body;
+        const result = await accountService.createAccount(email, password);
         if (!result.success) {
             return res.status(400).json(result);
         }
