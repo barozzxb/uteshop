@@ -1,33 +1,31 @@
-import express from "express";
-import cors from "cors";
-import { sequelize, connectDB } from "./config/configdb.js";
-import authRoutes from "./routes/authRoutes.js";
-import profileRoutes from "./routes/profileRoutes.js"; 
+import 'dotenv/config';
+import express from 'express';
+import apiRoutes from './routes/api.js';
+import connectDB from './config/database.js';
+import cors from 'cors';
+import path from 'path';
 
 const app = express();
 
 app.use(cors());
-// app.use(cors({ origin: "http://localhost:3000" })); 
+app.use(express.json());
 
-app.use(express.json({ limit: "10mb" })); 
-app.use("/api/auth", authRoutes);
-app.use("/api", profileRoutes); 
+const port = process.env.PORT;
 
-const PORT = 5000;
+app.use('/api/v1', apiRoutes);
+app.use("/uploads", express.static(path.join(process.cwd(), "uploads")));
 
-const startServer = async () => {
-  try {
-    await connectDB();
-    await sequelize.sync({ alter: true });
-    console.log("All models were synchronized successfully.");
+(async () => {
+    try {
+        await connectDB();
+        console.log('Connected to MongoDB');
+        app.listen(port, () => {
+            console.log(`Server is running on port ${port}`);
+        });
+    } catch (error) {
+        console.error('Failed to connect to MongoDB', error);
+    }
+})();
 
-    app.listen(PORT, () => {
-      console.log(`Server running on http://localhost:${PORT}`);
-      console.log(`Profile API: http://localhost:${PORT}/api/profile?email=...`);
-    });
-  } catch (error) {
-    console.error("Server failed to start:", error);
-  }
-};
 
-startServer();
+

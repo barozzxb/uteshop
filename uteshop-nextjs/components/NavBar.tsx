@@ -1,8 +1,9 @@
 "use client";
 
-import { useState, useEffect, useRef } from "react";
-import Link from "next/link";
-import Image from "next/image";
+import Image from 'next/image';
+import Link from 'next/link';
+import { useState } from 'react';
+import { useEffect, useRef } from "react";
 import { ChevronDown, Package, LogOut, Edit3 } from "lucide-react";
 
 interface UserInfo {
@@ -12,7 +13,7 @@ interface UserInfo {
   avatar?: string;
 }
 
-export default function UserNavBar() {
+export default function NavBar() {
   const [user, setUser] = useState<UserInfo | null>(null);
   const [open, setOpen] = useState(false);
   const ref = useRef<HTMLDivElement>(null);
