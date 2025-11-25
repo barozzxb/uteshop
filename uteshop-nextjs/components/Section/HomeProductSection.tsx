@@ -7,10 +7,15 @@ interface ProductSectionProps {
 
 export default function ProductSection({ prods }: ProductSectionProps) {
   return (
-    <div className="flex justify-center items-center gap-6 flex-wrap">
-      {prods.map((prod) => (
-        <ProductCard key={prod._id} {...prod} />
-      ))}
+    <div className="flex justify-center">
+      <div className="inline-grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-6">
+        {prods.map((prod) => (
+          <div key={prod._id} className="w-full">
+            <ProductCard {...prod} />
+          </div>
+        ))}
+
+      </div>
     </div>
   );
 }

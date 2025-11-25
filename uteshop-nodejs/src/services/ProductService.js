@@ -57,7 +57,7 @@ class ProductService {
                 .select('productsku sold -_id')
                 .lean();
             const skus = stats.map(s => s.productsku);
-            if (ids.length === 0) return [];
+            if (skus.length === 0) return [];
 
             const products = await Product.find({ sku: { $in: skus } }).lean();
 
@@ -77,7 +77,7 @@ class ProductService {
                 .select('productsku views -_id')
                 .lean();
             const skus = stats.map(s => s.productsku);
-            if (ids.length === 0) return [];
+            if (skus.length === 0) return [];
 
             const products = await Product.find({ sku: { $in: skus } }).lean();
 
@@ -93,7 +93,7 @@ class ProductService {
 
     async addProduct(dto) {
         if (!dto) return { success: false, message: 'Null error', data: null };
-
+        console.log(dto.genre);
         const sku = await getNextSkuByGenre({
             genreId: dto.genre
         });

@@ -20,7 +20,7 @@ class ManageProductController {
             }
             return res.status(201).json(result);
         } catch (error) {
-            console.error(err);
+            console.error(error);
             return res.status(500).json({ success: false, message: 'Server error', data: null });
         };
     };

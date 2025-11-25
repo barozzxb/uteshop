@@ -1,5 +1,7 @@
 import axiosClient from "@/utils/axiosClient";
 
+//End-user access
+
 export const getAllProductPage = async ({ genre, page = 1, limit = 10 }: {
     genre?: string;
     page?: number;
@@ -10,7 +12,7 @@ export const getAllProductPage = async ({ genre, page = 1, limit = 10 }: {
         return {success: true, body: res.data};
     }
     return {success: false, body: res.data};
-}
+};
 
 export const getNewProducts = async () => {
     const res = await axiosClient.get(`/products/new`);
@@ -18,4 +20,20 @@ export const getNewProducts = async () => {
         return {success: true, body: res.data};
     }
     return {success: false, body: res.data};
-}
+};
+
+export const getTopSalesProducts = async () => {
+    const res = await axiosClient.get(`/products/top-sales`);
+    if (res.status === 200) {
+        return {success: true, body: res.data};
+    }
+    return {success: false, body: res.data};
+};
+
+export const getMostViewsProducts = async () => {
+    const res = await axiosClient.get(`/products/most-views`);
+    if (res.status === 200) {
+        return {success: true, body: res.data};
+    }
+    return {success: false, body: res.data};
+};
