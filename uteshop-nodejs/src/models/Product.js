@@ -14,5 +14,7 @@ const productSchema = new mongoose.Schema({
     createdAt: { type: Date, default: Date.now }
 })
 
+productSchema.index({genre: 1, createdAt: -1});
+
 const Product = mongoose.model("product", productSchema);
 export default Product;

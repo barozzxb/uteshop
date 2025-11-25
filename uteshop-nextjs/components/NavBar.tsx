@@ -7,7 +7,7 @@ import { useState } from 'react';
 export const NavBar = () => {
 
     return (
-        <header className="w-full bg-white/80 backdrop-blur-md shadow-lg">
+        <header className="w-full bg-white/80 backdrop-blur-md shadow-lg z-10">
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                 <div className="h-16 flex items-center justify-between">
                     <div className="flex items-center gap-4">
@@ -37,7 +37,7 @@ export const NavBar = () => {
                                 <span className="absolute -top-1 -right-1 inline-flex items-center justify-center px-1.5 py-0.5 text-xs font-semibold leading-none text-white bg-red-500 rounded-full">3</span>
                         </Link>
 
-                        <Link href="/login" className="hidden sm:inline-flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-blue-600 to-indigo-600 text-white rounded-full shadow hover:scale-[1.02] transition-transform">
+                        <Link href="/login" className="hidden sm:inline-flex items-center gap-2 px-4 py-2 bg-linear-to-r from-blue-600 to-indigo-600 text-white rounded-full shadow hover:scale-[1.02] transition-transform">
                                 <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor">
                                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M16 11c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zM6 21v-2a4 4 0 014-4h4" />
                                 </svg>

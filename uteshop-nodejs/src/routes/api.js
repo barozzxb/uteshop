@@ -29,8 +29,9 @@ router.post('/manage/genre/add', mgenreController.addGenre);
 router.post('/manage/product/add', mprodController.addProduct);
 
 //product
-router.get('/products', prodController.getAllProducts);
+router.get('/products', prodController.getAllProductsPage);
 router.get('/products/top-sales', prodController.getTopSaleProduct);
 router.get('/products/most-views', prodController.getMostViewsProduct);
+router.get('/products/new', prodController.getNewProducts);
 
 export default router;
