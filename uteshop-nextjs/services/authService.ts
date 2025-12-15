@@ -1,5 +1,4 @@
-//auth services
-import axios from "../utils/axiosClient";
+import axiosClient from "../utils/axiosClient";
 
 export interface ApiResponse<T> {
   message: string;
@@ -7,7 +6,7 @@ export interface ApiResponse<T> {
 }
 
 export const forgotPassword = async (email: string) => {
-  return axios.post<ApiResponse<null>>("/forgot-password", { email });
+  return axiosClient.post<ApiResponse<null>>("/forgot-password", { email });
 };
 
 export const updateProfile = async (data: {
@@ -15,7 +14,7 @@ export const updateProfile = async (data: {
   name?: string;
   phone?: string;
 }) => {
-  return axios.put<
+  return axiosClient.put<
     ApiResponse<{ email: string; name?: string; phone?: string }>
   >("/update-profile", data);
 };

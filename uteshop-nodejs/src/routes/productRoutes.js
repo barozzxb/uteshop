@@ -1,11 +1,14 @@
-const express = require("express");
-const router = express.Router();
-const {
-  getAllProducts,
-  getProductById,
-} = require("../controllers/productController");
+import express from 'express';
+const prodRouter = express.Router();
+import ProductController from '../controllers/ProductController.js';
 
-router.get("/", getAllProducts); // API: /api/v1/products
-router.get("/:id", getProductById); // API: /api/v1/products/12345
+const prodController = new ProductController();
 
-module.exports = router;
+prodRouter.get("/", prodController.getAllProducts);
+prodRouter.get("/:id", prodController.getProductBySku);
+prodRouter.get('/products', prodController.getAllProductsPage);
+prodRouter.get('/products/top-sales', prodController.getTopSaleProduct);
+prodRouter.get('/products/most-views', prodController.getMostViewsProduct);
+prodRouter.get('/products/new', prodController.getNewProducts);
+
+export default prodRouter;

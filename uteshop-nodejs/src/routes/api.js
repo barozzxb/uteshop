@@ -4,12 +4,12 @@ import {sendOTPEmail, verifyOTP} from '../controllers/OTPController.js';
 import ManageProductController from '../controllers/admin/ManageProductController.js';
 import ManageGenreController from '../controllers/admin/ManageGenreController.js'
 
-import ProductController from '../controllers/ProductController.js';
+import prodRouter from '../routes/productRoutes.js'
 
 const mprodController = new ManageProductController();
 const mgenreController = new ManageGenreController();
 
-const prodController = new ProductController();
+
 
 const router = express.Router();
 
@@ -55,9 +55,6 @@ router.post('/manage/genre/add', mgenreController.addGenre);
 router.post('/manage/product/add', mprodController.addProduct);
 
 //product
-router.get('/products', prodController.getAllProductsPage);
-router.get('/products/top-sales', prodController.getTopSaleProduct);
-router.get('/products/most-views', prodController.getMostViewsProduct);
-router.get('/products/new', prodController.getNewProducts);
+router.use("/products", prodRouter);
 
 export default router;
