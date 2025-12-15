@@ -1,35 +1,34 @@
 "use client";
 import React, { useState, useEffect, use } from "react";
-import { getProductById } from "@/services/productService";
+import { getProductById } from '@/services/productService';
 import Link from "next/link";
 
-// Import Swiper React components
 import { Swiper, SwiperSlide } from "swiper/react";
 import { Navigation, Pagination, Thumbs } from "swiper/modules";
 
-// Import Swiper styles
 import "swiper/css";
 import "swiper/css/navigation";
 import "swiper/css/pagination";
 import "swiper/css/thumbs";
 
 export default function ProductDetailPage({ params }) {
-  // Next.js 15: unwrap params bằng use()
+
   const resolvedParams = use(params);
   const productId = resolvedParams.id;
 
   const [product, setProduct] = useState(null);
   const [loading, setLoading] = useState(true);
 
-  // State cho chức năng
+
   const [quantity, setQuantity] = useState(1);
   const [thumbsSwiper, setThumbsSwiper] = useState(null);
 
   useEffect(() => {
     const fetchProduct = async () => {
       try {
-        const res = await getProductById(productId);
-        setProduct(res.data.data);
+        const {message, body} = await getProductById(productId);
+        console.log(body.data);
+        setProduct(body.data.data);
       } catch (error) {
         console.error("Lỗi lấy sản phẩm:", error);
       } finally {
@@ -156,7 +155,7 @@ export default function ProductDetailPage({ params }) {
           <div className="mb-4">
             <span className="font-semibold">Danh mục: </span>
             <span className="bg-gray-100 text-gray-800 text-xs font-medium px-2.5 py-0.5 rounded">
-              {product.category}
+              {product.genre}
             </span>
           </div>
 

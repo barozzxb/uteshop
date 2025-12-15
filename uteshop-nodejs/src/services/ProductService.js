@@ -88,6 +88,16 @@ class ProductService {
         }
     };
 
+    async findBySku(sku) {
+        try {
+            let result = await Product.findOne({sku});
+            return { success: true, message: 'Get product sucessfully', data: result };
+        } catch (error) {
+            console.log(error);
+            return { success: false, message: 'Unexpected error', data: null };
+        }
+    };
+
 
     //For admin
 

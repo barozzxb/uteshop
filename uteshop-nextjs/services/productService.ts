@@ -37,3 +37,12 @@ export const getMostViewsProducts = async () => {
     }
     return {success: false, body: res.data};
 };
+
+
+export const getProductById = async (id: String) => {
+  const res = await axiosClient.get(`/products/${id}`);
+    if (res.status === 200) {
+        return {success: true, body: res.data};
+    }
+    return {success: false, body: res.data};
+};
