@@ -6,7 +6,13 @@ const accountSchema = new mongoose.Schema({
     role: { type: String, default: 'USER' },
     createdAt: { type: Date, default: Date.now },
     status: { type: Boolean, default: false },
-    accDetail: { type: mongoose.Schema.Types.ObjectId, ref: 'accountdetail' }
+    firstName: String,
+    lastName: String,
+    phonenumber: String,
+    address: String,
+    gender: String,
+    dob: Date,
+    avatar: String,
 });
 
 const Account = mongoose.model('account', accountSchema);

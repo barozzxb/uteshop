@@ -1,5 +1,5 @@
 import express from 'express';
-import { register ,getAccountByEmail, setActive } from '../controllers/AccountController.js';
+import { register ,getAccountByEmail, setActive, login } from '../controllers/AccountController.js';
 import {sendOTPEmail, verifyOTP} from '../controllers/OTPController.js';
 import ManageProductController from '../controllers/admin/ManageProductController.js';
 import ManageGenreController from '../controllers/admin/ManageGenreController.js'
@@ -17,10 +17,10 @@ router.post('/auth/register', register);
 router.get('/account/:email', getAccountByEmail);
 router.post('/account/activate', setActive);
 
+router.post("/login", login);
 
 router.post('/auth/send-otp', sendOTPEmail);
 router.post('/auth/verify-otp', verifyOTP);
-
 
 
 //admin routes

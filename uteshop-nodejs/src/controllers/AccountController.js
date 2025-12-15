@@ -4,8 +4,8 @@ const accountService = new AccountService();
 
 export const register = async (req, res) => {
     try {
-        const { email, password } = req.body;
-        const result = await accountService.createAccount(email, password);
+        const { email, password, firstname, lastname } = req.body;
+        const result = await accountService.createAccount(email, password, firstname, lastname);
         if (!result.success) {
             return res.status(400).json(result);
         }
@@ -36,6 +36,20 @@ export const getAccountByEmail = async (req, res) => {
         const result = await accountService.getAccountByEmail(email);
         if (!result.success) {
             return res.status(404).json(result);
+        }
+        return res.status(200).json(result);
+    } catch (err) {
+        console.error(err);
+        return res.status(500).json({ success: false, message: 'Server error', data: null });
+    }
+};
+
+export const login = async (req, res) => {
+    try {
+        const { email, password } = req.body;
+        const result = await accountService.login(email, password);
+        if (!result.success) {
+            return res.status(400).json(result);
         }
         return res.status(200).json(result);
     } catch (err) {

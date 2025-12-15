@@ -5,6 +5,7 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { login } from "@/services/authService";
 import { Mail, Lock, Loader2, ShoppingBag } from "lucide-react";
+import { toast } from "react-toastify";
 
 export default function LoginPage() {
   const router = useRouter();
@@ -17,30 +18,26 @@ export default function LoginPage() {
     e.preventDefault();
     setLoading(true);
 
-    const res = await login(email, password);
+    const { success, data } = await login(email, password);
     setLoading(false);
 
-    if (res.status !== 200) {
-      setMsg(res.message);
+    if (!success) {
+      setMsg(data.message);
+      toast.error(data.message);
       return;
     }
-
-    // Lưu token + thông tin user
-    localStorage.setItem("token", res.token);
-    localStorage.setItem("user", JSON.stringify(res.body));
-
-    if (res.body.role === "admin") router.push("/admin");
+    if (data.user.role === "admin") router.push("/admin");
     else router.push("/user/home");
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-orange-50 to-amber-50 flex items-center justify-center p-4">
+    <div className="min-h-screen bg-linear-to-br from-orange-50 to-amber-50 flex items-center justify-center p-4">
       <div className="w-full max-w-md">
-        <div className="bg-gradient-to-br from-white to-orange-50/50 rounded-2xl shadow-lg p-8 border border-orange-100">
+        <div className="bg-linear-to-br from-white to-orange-50/50 rounded-2xl shadow-lg p-8 border border-orange-100">
 
           <div className="flex justify-center mb-8">
             <div className="flex items-center gap-2">
-              <div className="w-10 h-10 bg-gradient-to-br from-orange-400 to-amber-400 rounded-lg flex items-center justify-center text-white font-bold text-xl shadow-sm">
+              <div className="w-10 h-10 bg-linear-to-br from-orange-400 to-amber-400 rounded-lg flex items-center justify-center text-white font-bold text-xl shadow-sm">
                 U
               </div>
               <span className="text-2xl font-bold text-gray-800">UTE Shop</span>
@@ -77,7 +74,7 @@ export default function LoginPage() {
             <button
               type="submit"
               disabled={loading}
-              className="w-full bg-gradient-to-r from-orange-400 to-amber-400 text-white py-3.5 rounded-xl flex items-center justify-center gap-2"
+              className="w-full bg-linear-to-r from-orange-400 to-amber-400 text-white py-3.5 rounded-xl flex items-center justify-center gap-2"
             >
               {loading ? (
                 <>
