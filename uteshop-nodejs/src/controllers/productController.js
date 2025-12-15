@@ -43,7 +43,7 @@ class ManageProductController {
         };
     };
 
-    async getAllProductsPage(req, res) {
+    async getAllProductsPage(req, res){
         try {
             const {
                 genre, limit = 10, page, sort = "-createdAt"
@@ -97,21 +97,6 @@ class ManageProductController {
             console.error(err);
             return res.status(500).json({ success: false, message: 'Server error', data: null });
         };
-    };
-
-    // Lấy chi tiết 1 sản phẩm theo ID
-    async getProductBySku(req, res) {
-        try {
-            const product = await prodServ.findBySku(req.params.id);
-
-            if (!product) {
-                return res.status(404).json({ message: "Không tìm thấy sản phẩm" });
-            }
-
-            res.status(200).json({ success: true, data: product });
-        } catch (error) {
-            res.status(500).json({ message: "Lỗi server hoặc ID sai định dạng" });
-        }
     };
 
 }
