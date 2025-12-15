@@ -63,7 +63,7 @@ export default function UserPage() {
 
   return (
     <div className="min-h-screen bg-gray-50">
-      <nav className="bg-white shadow-sm border-b sticky top-0 z-50">
+      {/* <nav className="bg-white shadow-sm border-b sticky top-0 z-50">
         <div className="max-w-7xl mx-auto px-6 py-4 flex justify-between items-center">
           <Link href="/user/home" className="flex items-center gap-3">
             <div className="w-10 h-10 bg-gradient-to-br from-blue-600 to-violet-600 rounded-xl flex items-center justify-center text-white font-bold text-lg">
@@ -127,12 +127,12 @@ export default function UserPage() {
             )}
           </div>
         </div>
-      </nav>
+      </nav> */}
 
       <div className="max-w-7xl mx-auto px-6 py-12">
         <div className="bg-white rounded-2xl shadow-lg p-10 text-center">
           <h1 className="text-4xl font-bold text-gray-800 mb-4">
-            Xin chào, <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-600 to-violet-600">{displayName}</span>!
+            Xin chào, <span className="text-transparent bg-clip-text bg-linear-to-r from-blue-600 to-violet-600">{displayName}</span>!
           </h1>
           <p className="text-xl text-gray-600">Chào mừng bạn đến với khu vực người dùng</p>
         </div>

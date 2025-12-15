@@ -41,13 +41,13 @@ export default function NavBar() {
   }, []);
 
   return (
-    <nav className="bg-white border-b sticky top-0 z-40">
+    <nav className="bg-white border-b sticky top-0 z-60">
       <div className="max-w-7xl mx-auto px-6 h-16 flex items-center justify-between">
         <Link href="/user/home" className="flex items-center gap-3">
-          <div className="w-10 h-10 bg-gradient-to-br from-blue-600 to-violet-600 rounded-xl flex items-center justify-center text-white font-bold text-lg">
+          <div className="w-10 h-10 bg-linear-to-br from-blue-600 to-violet-600 rounded-xl flex items-center justify-center text-white font-bold text-lg">
             UTE
           </div>
-          <span className="text-2xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-blue-600 to-violet-600">
+          <span className="text-2xl font-bold text-transparent bg-clip-text bg-linear-to-r from-blue-600 to-violet-600">
             UTE Shop
           </span>
         </Link>
@@ -61,7 +61,7 @@ export default function NavBar() {
               {user?.avatar ? (
                 <Image src={user.avatar} alt="" width={44} height={44} className="object-cover" />
               ) : (
-                <div className="w-full h-full bg-gradient-to-br from-blue-500 to-violet-500 text-white flex items-center justify-center font-bold text-lg">
+                <div className="w-full h-full bg-linear-to-br from-blue-500 to-violet-500 text-white flex items-center justify-center font-bold text-lg">
                   {getInitial()}
                 </div>
               )}
@@ -72,7 +72,7 @@ export default function NavBar() {
 
           {open && (
             <div className="absolute right-0 mt-3 w-72 bg-white rounded-2xl shadow-2xl border">
-              <div className="p-5 bg-gradient-to-r from-blue-600 to-violet-600 text-white">
+              <div className="p-5 bg-linear-to-r from-blue-600 to-violet-600 text-white">
                 <p className="font-bold text-lg">{fullName}</p>
                 <p className="text-sm opacity-90">{user?.email}</p>
               </div>

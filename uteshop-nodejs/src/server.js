@@ -5,6 +5,8 @@ import connectDB from './config/database.js';
 import cors from 'cors';
 import path from 'path';
 
+import router from './routes/profileRoutes.js';
+
 const app = express();
 
 app.use(cors());
@@ -13,6 +15,7 @@ app.use(express.json());
 const port = process.env.PORT;
 
 app.use('/api/v1', apiRoutes);
+app.use('/api/v1/user', router);
 app.use("/uploads", express.static(path.join(process.cwd(), "uploads")));
 
 (async () => {

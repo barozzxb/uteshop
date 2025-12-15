@@ -18,7 +18,7 @@ export default function AdminDashboard() {
             </div>
           </div>
           <h1 className="text-3xl font-bold text-gray-800">
-            Đây là trang chủ của Admin
+            Trang thêm sản phẩm
           </h1>
           <p className="mt-2 text-sm text-orange-600 font-medium">
             UTE Shop – Quản trị hệ thống

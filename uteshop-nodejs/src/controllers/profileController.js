@@ -1,29 +1,21 @@
-// controllers/profileController.js
-import User from "../models/user.js";
+import Account from "../models/Account.js";
 
-// GET: Lấy thông tin profile
 export const getProfile = async (req, res) => {
   const { email } = req.query;
   if (!email) return res.status(400).json({ message: "Thiếu email" });
 
   try {
-    const user = await User.findOne({
-      where: { email },
-      attributes: ["fullName", "email", "phone", "avatar"],
-    });
+    const user = await Account.findOne({email});
 
     if (!user) return res.status(404).json({ message: "Không tìm thấy người dùng" });
-
-    const nameParts = user.fullName.trim().split(" ");
-    const firstname = nameParts.pop() || "";
-    const lastname = nameParts.join(" ") || "";
-
     res.json({
-      firstname,
-      lastname,
-      fullName: user.fullName,
+      firstname: user.firstName,
+      lastname: user.lastName,
       email: user.email,
       phone: user.phone || "",
+      address: user.address,
+      gender: user.gender,
+      dob: user.dob,
       avatar: user.avatar || null,
     });
   } catch (error) {
@@ -34,32 +26,34 @@ export const getProfile = async (req, res) => {
 
 // PUT: Cập nhật profile
 export const updateProfile = async (req, res) => {
-  const { email, fullName, phone, avatar } = req.body;
+  const { email, firstName, lastName, phone, avatar, address, gender, dob } = req.body; // thêm field mới
 
   if (!email) return res.status(400).json({ message: "Thiếu email" });
 
   try {
-    const user = await User.findOne({ where: { email } });
+    const user = await Account.findOne({ email });
     if (!user) return res.status(404).json({ message: "Không tìm thấy người dùng" });
 
     await user.update({
-      fullName: fullName ?? user.fullName,
+      firstName: firstName ?? user.firstName,
+      lastName: lastName ?? user.lastName,
       phone: phone ?? user.phone,
       avatar: avatar ?? user.avatar,
+      address: address ?? user.address,
+      gender: gender ?? user.gender,
+      dob: dob ?? user.dob,
     });
-
-    const nameParts = user.fullName.trim().split(" ");
-    const firstname = nameParts.pop() || "";
-    const lastname = nameParts.join(" ") || "";
 
     res.json({
       message: "Cập nhật hồ sơ thành công!",
       user: {
-        firstname,
-        lastname,
-        fullName: user.fullName,
+        firstName,
+        lastNname,
         email: user.email,
         phone: user.phone || "",
+        address: user.address || "",
+        gender: user.gender || "",
+        dob: user.dob || "",
         avatar: user.avatar || null,
       },
     });
