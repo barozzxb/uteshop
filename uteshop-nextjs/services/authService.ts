@@ -69,3 +69,15 @@ export const logout = async () => {
     window.dispatchEvent(new Event("userUpdated"));
     return "Đăng xuất thành công";
 };
+
+import axios from "axios";
+const API_URL =
+  process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000/api/v1/auth";
+export const requestForgotPassword = async (email: string) => {
+  // Gọi endpoint backend
+  return axios.post(`${API_URL}/forgot-password`, { email });
+};
+
+export const resetPassword = async (token: string, password: string) => {
+  return axios.put(`${API_URL}/reset-password/${token}`, { password });
+};

@@ -8,17 +8,15 @@ export default function ProfilePage() {
   const [phone, setPhone] = useState("");
   const [msg, setMsg] = useState("");
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     try {
       const res = await updateProfile({ email, name, phone });
       setMsg(res.data.message);
     } catch (err) {
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      const error = err as any;
-
-      if (error.isAxiosError) {
-        setMsg(error.response?.data?.message || "Update failed!");
+      // Trong JS thuần, 'err' tự động là object, không cần ép kiểu
+      if (err.isAxiosError) {
+        setMsg(err.response?.data?.message || "Update failed!");
       } else {
         setMsg("Unexpected error");
       }
