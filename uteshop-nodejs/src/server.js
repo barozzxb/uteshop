@@ -1,32 +1,40 @@
-const express = require("express");
-const cors = require("cors");
-const mongoose = require("mongoose");
-require("dotenv").config();
+import 'dotenv/config';
+import express from 'express';
+import cors from 'cors';
+import path from 'path';
+import mongoose from 'mongoose';
 
-const authRoutes = require("./routes/authRoutes");
+import apiRoutes from './routes/api.js';
+import router from './routes/profileRoutes.js';
+import authRoutes from './routes/authRoutes.js';
+import connectDB from './config/database.js';
 
 const app = express();
+const PORT = process.env.PORT || 4000;
 
-app.use(
-  cors({
-    origin: "http://localhost:3000",
-    credentials: true,
-  })
-);
-
+// Middleware
+app.use(cors({
+  origin: "http://localhost:3000",
+  credentials: true,
+}));
 app.use(express.json());
+app.use("/uploads", express.static(path.join(process.cwd(), "uploads")));
 
-//ket noi database
-const MONGO_URI = process.env.MONGO_URI || "mongodb://localhost:27017/uteshop";
-
-mongoose
-  .connect(MONGO_URI)
-  .then(() => console.log("Ket noi MongoDB thanh cong"))
-  .catch((err) => console.error("Ket noi MongoDB that bai: ", err));
-
+// Routes
+app.use('/api/v1', apiRoutes);
+app.use('/api/v1/user', router);
 app.use("/api/v1/auth", authRoutes);
 
-const PORT = 4000;
-app.listen(PORT, () =>
-  console.log(`Server running at http://localhost:${PORT}`)
-);
+// Connect to MongoDB
+(async () => {
+  try {
+    await connectDB(); // connectDB trong config/database.js dùng mongoose.connect
+    console.log('Connected to MongoDB');
+
+    app.listen(PORT, () => {
+      console.log(`Server is running on port ${PORT}`);
+    });
+  } catch (error) {
+    console.error('Failed to connect to MongoDB', error);
+  }
+})();
