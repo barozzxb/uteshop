@@ -22,7 +22,8 @@ export default function Home() {
         toast.error(body.data.message);
         return;
       }
-      setNewProds(body.data)
+      console.log('New Products:', body.data);
+      setNewProds(body.data.items)
     } catch (error) {
       console.log(error);
     }
@@ -35,7 +36,8 @@ export default function Home() {
         toast.error(body.data.message);
         return;
       }
-      setTopSalesProds(body.data)
+      console.log('Top Sales Products:', body.data);
+      setTopSalesProds(body.data.items)
     } catch (error) {
       console.log(error);
     }
@@ -48,7 +50,8 @@ export default function Home() {
         toast.error(body.data.message);
         return;
       }
-      setMostViewsProds(body.data)
+      console.log('Most Views Products:', body.data);
+      setMostViewsProds(body.data.items)
     } catch (error) {
       console.log(error);
     }

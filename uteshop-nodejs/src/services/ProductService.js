@@ -5,13 +5,18 @@ import { getNextSkuByGenre } from '../utils/generateSKU.js';
 class ProductService {
     async getAllProducts() {
         try {
-            let result = await Product.find();
-            return { success: true, message: 'Get product list sucessfully', data: result };
+            const items = await Product.find().lean();
+            return {
+                success: true,
+                message: 'Get all products successfully',
+                data: { items }
+            };
         } catch (error) {
             console.log(error);
             return { success: false, message: 'Unexpected error', data: null };
         }
-    };
+    }
+
 
     async getAllProductsPage(genre, limit = 10, page, sort = "-createdAt") {
         try {
@@ -30,7 +35,7 @@ class ProductService {
                     .lean(),
                 Product.countDocuments(filters)
             ]);
-            const totalPages = Math.ceil(total/parsedLimit);
+            const totalPages = Math.ceil(total / parsedLimit);
             return { success: true, message: "Get products page successfully", data: { page: p, totalPages, limit: parsedLimit, total: total, items: items } };
         } catch (error) {
             console.log(error);
@@ -38,59 +43,62 @@ class ProductService {
         }
     };
 
-    async getNewProducts(limit) {
+    async getNewProducts(limit = 8) {
         try {
-            let result = await Product.find().sort({ createdAt: -1 }).limit(limit);
-            return { success: true, message: 'Get product list sucessfully', data: result };
+            const items = await Product.find()
+                .sort({ createdAt: -1 })
+                .limit(limit)
+                .lean();
+
+            return {
+                success: true,
+                message: 'Get new products successfully',
+                data: { items }
+            };
         } catch (error) {
             console.log(error);
             return { success: false, message: 'Unexpected error', data: null };
         }
     }
 
-    async getTopSaleProduct(limit) {
+
+    async getTopSaleProduct(limit = 6) {
         try {
-
-            const stats = await ProductStats.find()
-                .sort({ sold: -1 })
-                .limit(limit)
-                .select('productsku sold -_id')
-                .lean();
+            const stats = await ProductStats.find().sort({ sold: -1 }).limit(limit).select('productsku -_id').lean();
             const skus = stats.map(s => s.productsku);
-            if (skus.length === 0) return [];
-
-            const products = await Product.find({ sku: { $in: skus } }).lean();
-
-            return { success: true, message: 'Get most sales product list sucessfully', data: products };
+            const items = skus.length ? await Product.find({ sku: { $in: skus } }).lean() : [];
+            return {
+                success: true,
+                message: 'Get top sale products successfully',
+                data: { items }
+            };
         } catch (error) {
             console.log(error);
             return { success: false, message: 'Unexpected error', data: null };
         }
-    };
+    }
 
-    async getMostViewsProduct(limit) {
+    async getMostViewsProduct(limit = 8) {
         try {
-
-            const stats = await ProductStats.find()
-                .sort({ views: -1 })
-                .limit(limit)
-                .select('productsku views -_id')
-                .lean();
+            const stats = await ProductStats.find().sort({ views: -1 }).limit(limit).select('productsku -_id').lean();
             const skus = stats.map(s => s.productsku);
-            if (skus.length === 0) return [];
-
-            const products = await Product.find({ sku: { $in: skus } }).lean();
-
-            return { success: true, message: 'Get most views product list sucessfully', data: products };
+            const items = skus.length ? await Product.find({ sku: { $in: skus } }).lean() : [];
+            return {
+                success: true,
+                message: 'Get most viewed products successfully',
+                data: { items }
+            };
         } catch (error) {
             console.log(error);
             return { success: false, message: 'Unexpected error', data: null };
         }
-    };
+    }
+
+
 
     async findBySku(sku) {
         try {
-            let result = await Product.findOne({sku});
+            let result = await Product.findOne({ sku });
             return { success: true, message: 'Get product sucessfully', data: result };
         } catch (error) {
             console.log(error);
