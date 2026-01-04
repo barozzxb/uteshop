@@ -1,63 +1,106 @@
 import Account from '../models/Account.js';
-import AccountDetail from '../models/AccountDetail.js';
 import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken';
+import ApiError from '../utils/ApiError.js';
 
 class AccountService {
   async createAccount(email, password, firstName, lastName) {
     const existingAccount = await Account.findOne({ email });
     if (existingAccount) {
-      return { success: false, message: 'Email already in use', data: null };
+      throw new ApiError(400, 'Email already in use');
     }
-    const hashedPassword = await bcrypt.hash(password, 10);
-    const newAccount = await Account.create({ email, password: hashedPassword , firstName, lastName});
-    await newAccount.save();
 
-    return { success: true, message: 'Account created successfully', data: null };
+    const hashedPassword = await bcrypt.hash(password, 10);
+
+    return Account.create({
+      email,
+      password: hashedPassword,
+      firstName,
+      lastName,
+    });
   }
 
   async getAccountByEmail(email) {
     const acc = await Account.findOne({ email }).populate('accDetail');
     if (!acc) {
-      return { success: false, message: 'Account not found', data: null };
+      throw new ApiError(404, 'Account not found');
     }
-
-    return { success: true, message: 'Account found', data: acc };
+    return acc;
   }
 
   async setActive(email) {
     const account = await Account.findOne({ email });
     if (!account) {
-      return { success: false, message: 'Account not found', data: null };
+      throw new ApiError(404, 'Account not found');
     }
+
     account.status = true;
     await account.save();
-    return { success: true, message: 'Account activated successfully', data: null };
   }
 
   async login(email, password) {
     const user = await Account.findOne({ email });
-    if (!user) return { success: false, message: 'Account not existed', data: null };
+    if (!user) {
+      throw new ApiError(400, 'Account not existed');
+    }
 
     const match = await bcrypt.compare(password, user.password);
-    if (!match) return { success: false, message: 'Invalid information', data: null };
+    if (!match) {
+      throw new ApiError(400, 'Invalid information');
+    }
+
+    if (!process.env.JWT_SECRET) {
+      throw new ApiError(500, 'JWT secret not configured');
+    }
 
     const token = jwt.sign(
-      { email: user.email, role: user.role },
-      "SECRET_KEY",
-      { expiresIn: "1d" }
+      { userId: user._id,email: user.email, role: user.role },
+      process.env.JWT_SECRET,
+      { expiresIn: '1d' }
     );
 
     return {
-      success: true, message: 'Login successfully', data: {
-        token,
-        user: {
-          email: user.email,
-          role: user.role,
-        },
-      }
+      token,
+      user: {
+        email: user.email,
+        role: user.role,
+      },
     };
+  }
+
+  async getProfileByEmail(email) {
+    const user = await Account.findOne({ email }).select("-password");
+    if (!user) {
+      throw new ApiError(404, `Account not found. Email: ${email}`);
+    }
+    return user;
+  }
+
+  async updateProfile(email, payload) {
+    const user = await Account.findOne({ email });
+    if (!user) {
+      throw new ApiError(404, `Account not found. Email: ${email}`);
+    }
+
+    const allowedFields = [
+      "firstName",
+      "lastName",
+      "phone",
+      "avatar",
+      "address",
+      "gender",
+      "dob",
+    ];
+
+    allowedFields.forEach(field => {
+      if (payload[field] !== undefined) {
+        user[field] = payload[field];
+      }
+    });
+
+    await user.save();
+    return user;
   }
 }
 
-export default AccountService;
+export default new AccountService();

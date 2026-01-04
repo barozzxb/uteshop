@@ -1,71 +1,76 @@
 import axiosClient from "../utils/axiosClient";
+import { ApiResponse } from "../types/types";
 
-export interface ApiResponse<T> {
-  message: string;
-  data?: T;
-}
-
-export const forgotPassword = async (email: string) => {
-  return axiosClient.post<ApiResponse<null>>("/forgot-password", { email });
-};
-
-export const updateProfile = async (data: {
-  email: string;
-  name?: string;
-  phone?: string;
-}) => {
-  return axiosClient.put<
-    ApiResponse<{ email: string; name?: string; phone?: string }>
-  >("/update-profile", data);
-};
-
-//auth services
-export const register = async (email: string, firstname: string, lastname: string, password: string) => {
-    const res = await axiosClient.post("/auth/register", {
-        email, firstname, lastname, password
+/**
+ * POST /register
+ */
+export const register = async (
+    email: string,
+    firstname: string,
+    lastname: string,
+    password: string
+) => {
+    const res = await axiosClient.post<ApiResponse<null>>("/register", {
+        email,
+        firstname,
+        lastname,
+        password,
     });
-    const status = res.status;
-    if (status === 201) {
-        localStorage.setItem("email", email);
-        return { success: true, data: res.data };
-    }
-    else {
-        return { success: false, data: res.data };
-    }
-}
 
-export const activeAccount = async (email: String) => {
-    const res = await axiosClient.post('/account/activate', { email })
-    if (res.status === 200) {
-        return { success: true, data: res.data };
-    }
-    return { success: false, data: res.data };
-}
+    return res.data;
+};
 
-export const login = async (email: string, password: string) => {
-    try {
-        const res = await axiosClient.post("/login", {
-            email,
-            password,
-        });
-
-            localStorage.setItem('user', JSON.stringify(res.data.data.user));
-            localStorage.setItem('token', res.data.data.token);
-            return { success: true, data: res.data.data };
-    } catch (error: any) {
-        console.log(error);
-        const message = error.response.data.message;
-        return { success: false, data: {message}};
+/**
+ * POST /login
+ */
+interface LoginResponse {
+    token: string;
+    user: {
+        email: string;
+        role: string;
     };
 }
 
+export const login = async (
+    email: string,
+    password: string
+): Promise<ApiResponse<LoginResponse>> => {
+    try {
+        const res = await axiosClient.post<ApiResponse<LoginResponse>>(
+            "/login",
+            { email, password }
+        );
 
+        if (res.data.success && res.data.data) {
+            localStorage.setItem("token", res.data.data.token);
+            localStorage.setItem("user", JSON.stringify(res.data.data.user));
+        }
 
-export const logout = async () => {
-    localStorage.removeItem("user");
-    localStorage.removeItem("token");
-    localStorage.removeItem("email");
-    localStorage.removeItem("role");
+        return res.data;
+    } catch (err: any) {
+        return {
+            success: false,
+            message:
+                err.response?.data?.message ||
+                "Login failed",
+        };
+    }
+};
+
+/**
+ * POST /account/activate
+ */
+export const activateAccount = async () => {
+    const res = await axiosClient.post<ApiResponse<null>>(
+        "/account/activate"
+    );
+    return res.data;
+};
+
+/**
+ * Logout (FE only)
+ */
+export const logout = () => {
+    localStorage.clear();
     window.dispatchEvent(new Event("userUpdated"));
-    return "Đăng xuất thành công";
 };

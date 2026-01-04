@@ -1,59 +1,100 @@
-import AccountService from '../services/AccountService.js';
+import accountService from '../services/AccountService.js';
+import ApiResponse from '../utils/apiResponse.js';
 
-const accountService = new AccountService();
-
-export const register = async (req, res) => {
+/**
+ * POST /api/auth/register
+ */
+export const register = async (req, res, next) => {
     try {
         const { email, password, firstname, lastname } = req.body;
-        const result = await accountService.createAccount(email, password, firstname, lastname);
-        if (!result.success) {
-            return res.status(400).json(result);
-        }
-        return res.status(201).json(result);
+
+        await accountService.createAccount(
+            email,
+            password,
+            firstname,
+            lastname
+        );
+
+        res.status(201).json(
+            ApiResponse.success('Account created successfully')
+        );
     } catch (err) {
-        console.error(err);
-        return res.status(500).json({ success: false, message: 'Server error', data: null });
+        next(err);
     }
 };
 
-export const setActive = async (req, res) => {
+/**
+ * POST /api/auth/activate
+ */
+export const setActive = async (req, res, next) => {
     try {
         const { email } = req.body;
-        const result = await accountService.setActive(email);
-        if (!result.success) {
-            return res.status(404).json(result);
-        }
-        return res.status(200).json(result);
+
+        await accountService.setActive(email);
+
+        res.status(200).json(
+            ApiResponse.success('Account activated successfully')
+        );
     } catch (err) {
-        console.error(err);
-        return res.status(500).json({ success: false, message: 'Server error', data: null });
+        next(err);
     }
 };
 
-export const getAccountByEmail = async (req, res) => {
+/**
+ * GET /api/accounts/:email
+ */
+export const getAccountByEmail = async (req, res, next) => {
     try {
         const { email } = req.params;
-        const result = await accountService.getAccountByEmail(email);
-        if (!result.success) {
-            return res.status(404).json(result);
-        }
-        return res.status(200).json(result);
+
+        const account = await accountService.getAccountByEmail(email);
+
+        res.status(200).json(
+            ApiResponse.success('Account found', account)
+        );
     } catch (err) {
-        console.error(err);
-        return res.status(500).json({ success: false, message: 'Server error', data: null });
+        next(err);
     }
 };
 
-export const login = async (req, res) => {
+/**
+ * POST /api/auth/login
+ */
+export const login = async (req, res, next) => {
     try {
         const { email, password } = req.body;
-        const result = await accountService.login(email, password);
-        if (!result.success) {
-            return res.status(400).json(result);
-        }
-        return res.status(200).json(result);
+
+        const data = await accountService.login(email, password);
+
+        res.status(200).json(
+            ApiResponse.success('Login successfully', data)
+        );
     } catch (err) {
-        console.error(err);
-        return res.status(500).json({ success: false, message: 'Server error', data: null });
+        next(err);
+    }
+};
+
+
+export const getProfile = async (req, res, next) => {
+    try {
+        const email = req.user.email;
+        console.log("Email from JWT:", email);
+
+        const user = await accountService.getProfileByEmail(email);
+
+        res.json(ApiResponse.success("Get profile success", user));
+    } catch (err) {
+        next(err);
+    }
+};
+
+
+export const updateProfile = async (req, res, next) => {
+    try {
+        const email = req.user.email;
+        const user = await accountService.updateProfile(email, req.body);
+        res.json(ApiResponse.success("Update profile success", user));
+    } catch (err) {
+        next(err);
     }
 };

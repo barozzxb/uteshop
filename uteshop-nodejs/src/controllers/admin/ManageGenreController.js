@@ -1,7 +1,5 @@
 import GenreService from "../../services/GenreService.js";
 
-const genreSer = new GenreService();
-
 class ManageGenreController {
     async addGenre(req, res) {
         try {
@@ -11,7 +9,7 @@ class ManageGenreController {
                 description: req.body.description
             };
 
-            const result = await genreSer.addGenre(dto);
+            const result = await GenreService.addGenre(dto);
             if (!result.success) {
                 return res.status(400).json(result);
             }

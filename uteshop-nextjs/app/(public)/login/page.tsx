@@ -9,72 +9,87 @@ import { toast } from "react-toastify";
 
 export default function LoginPage() {
   const router = useRouter();
+
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [msg, setMsg] = useState("");
   const [loading, setLoading] = useState(false);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
 
-    const { success, data } = await login(email, password);
+    const res = await login(email, password);
+
     setLoading(false);
 
-    if (!success) {
-      setMsg(data.message);
-      toast.error(data.message);
+    if (!res.success) {
+      toast.error(res.message);
       return;
     }
-    if (data.user.role === "admin") router.push("/admin");
-    else router.push("/user/home");
+
+    const role = res.data!.user.role;
+
+    if (role === "ADMIN") {
+      router.push("/admin");
+    } else {
+      router.push("/user/home");
+    }
   };
+
 
   return (
     <div className="min-h-screen bg-linear-to-br from-orange-50 to-amber-50 flex items-center justify-center p-4">
       <div className="w-full max-w-md">
         <div className="bg-linear-to-br from-white to-orange-50/50 rounded-2xl shadow-lg p-8 border border-orange-100">
 
+          {/* Logo */}
           <div className="flex justify-center mb-8">
             <div className="flex items-center gap-2">
               <div className="w-10 h-10 bg-linear-to-br from-orange-400 to-amber-400 rounded-lg flex items-center justify-center text-white font-bold text-xl shadow-sm">
                 U
               </div>
-              <span className="text-2xl font-bold text-gray-800">UTE Shop</span>
+              <span className="text-2xl font-bold text-gray-800">
+                UTE Shop
+              </span>
             </div>
           </div>
 
-          <h2 className="text-2xl font-semibold text-center text-gray-800 mb-2">
+          <h2 className="text-2xl font-semibold text-center text-gray-800 mb-6">
             Đăng nhập
           </h2>
 
           <form onSubmit={handleSubmit} className="space-y-5">
+            {/* Email */}
             <div className="relative">
               <Mail className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-orange-400" />
               <input
                 type="email"
                 placeholder="Email"
-                className="w-full pl-11 pr-4 py-3 bg-white/70 border border-orange-200 rounded-xl"
+                value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 required
+                className="w-full pl-11 pr-4 py-3 bg-white/70 border border-orange-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-orange-300"
               />
             </div>
 
+            {/* Password */}
             <div className="relative">
               <Lock className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-orange-400" />
               <input
                 type="password"
                 placeholder="Mật khẩu"
-                className="w-full pl-11 pr-4 py-3 bg-white/70 border border-orange-200 rounded-xl"
+                value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 required
+                className="w-full pl-11 pr-4 py-3 bg-white/70 border border-orange-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-orange-300"
               />
             </div>
 
+            {/* Submit */}
             <button
               type="submit"
               disabled={loading}
-              className="w-full bg-linear-to-r from-orange-400 to-amber-400 text-white py-3.5 rounded-xl flex items-center justify-center gap-2"
+              className="w-full bg-linear-to-r from-orange-400 to-amber-400 text-white py-3.5 rounded-xl flex items-center justify-center gap-2 disabled:opacity-70"
             >
               {loading ? (
                 <>
@@ -83,22 +98,19 @@ export default function LoginPage() {
                 </>
               ) : (
                 <>
-                  <span>Đăng Nhập</span>
+                  <span>Đăng nhập</span>
                   <ShoppingBag className="h-5 w-5" />
                 </>
               )}
             </button>
           </form>
 
-          {msg && (
-            <div className="mt-5 p-3 rounded-lg text-center bg-rose-50 text-rose-700 border border-rose-200">
-              {msg}
-            </div>
-          )}
-
           <div className="mt-8 text-center text-sm text-gray-700">
             Chưa có tài khoản?{" "}
-            <Link href="/register" className="text-orange-600 font-semibold">
+            <Link
+              href="/register"
+              className="text-orange-600 font-semibold hover:underline"
+            >
               Đăng ký
             </Link>
           </div>

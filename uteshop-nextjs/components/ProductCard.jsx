@@ -1,8 +1,6 @@
 import Link from "next/link";
 
-// ... trong vòng lặp map sản phẩm ...
 <div className="border p-4 rounded">
-  {/* Bấm vào ảnh -> Qua chi tiết */}
   <Link href={`/products/${product._id}`}>
     <img
       src={product.avatar}
@@ -10,7 +8,6 @@ import Link from "next/link";
     />
   </Link>
 
-  {/* Bấm vào tên -> Qua chi tiết */}
   <Link href={`/products/${product._id}`}>
     <h3 className="font-bold text-lg mt-2 hover:text-blue-600 cursor-pointer">
       {product.name}

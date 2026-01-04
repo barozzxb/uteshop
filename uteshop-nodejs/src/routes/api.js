@@ -1,10 +1,18 @@
 import express from 'express';
-import { register ,getAccountByEmail, setActive, login } from '../controllers/AccountController.js';
-import {sendOTPEmail, verifyOTP} from '../controllers/OTPController.js';
+import { register, setActive, login } from '../controllers/AccountController.js';
+import { sendOTPEmail, verifyOTP } from '../controllers/OTPController.js';
 import ManageProductController from '../controllers/admin/ManageProductController.js';
 import ManageGenreController from '../controllers/admin/ManageGenreController.js'
 
-import prodRouter from '../routes/productRoutes.js'
+import { authMiddleware } from '../middlewares/auth.js';
+import { authorizeRole } from '../middlewares/authorities.js';
+import prodRouter from '../routes/productRoutes.js';
+
+import accRouter from './accountRoute.js';
+import cmtRouter from '../routes/commentRoutes.js';
+import cartRouter from '../routes/cartRoute.js'
+import orderRouter from './orderRoute.js';
+import { getOrders } from '../controllers/user/OrderController.js';
 
 const mprodController = new ManageProductController();
 const mgenreController = new ManageGenreController();
@@ -13,14 +21,17 @@ const mgenreController = new ManageGenreController();
 
 const router = express.Router();
 
-router.post('/auth/register', register);
-router.get('/account/:email', getAccountByEmail);
+router.post('/register', register);
+router.post("/login", login);
 router.post('/account/activate', setActive);
 
-router.post("/login", login);
 
-router.post('/auth/send-otp', sendOTPEmail);
-router.post('/auth/verify-otp', verifyOTP);
+router.post('/send-otp', sendOTPEmail);
+router.post('/verify-otp', verifyOTP);
+
+
+// account routes
+router.use("/account", accRouter);
 
 const users = [{ email: "nguyenngocvan.qng@gmail.com", password: "123456" }];
 
@@ -53,8 +64,19 @@ router.put("/update-profile", (req, res) => {
 
 router.post('/manage/genre/add', mgenreController.addGenre);
 router.post('/manage/product/add', mprodController.addProduct);
+router.put("/manage/product/:sku", authMiddleware, authorizeRole("ADMIN"), mprodController.editProduct);
+
 
 //product
 router.use("/products", prodRouter);
 
+//comment
+router.use("/comments", cmtRouter)
+
+//cart
+router.use("/cart", cartRouter);
+
+//order
+router.get("/orders", authMiddleware, getOrders);
+router.use("/order", orderRouter);
 export default router;
