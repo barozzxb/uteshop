@@ -6,19 +6,17 @@ import { useParams, useRouter } from "next/navigation";
 import { Swiper, SwiperSlide } from "swiper/react";
 import { Navigation, Thumbs, FreeMode } from "swiper/modules";
 import type { Swiper as SwiperType } from "swiper";
-
 import "swiper/css";
 import "swiper/css/navigation";
 import "swiper/css/thumbs";
 import "swiper/css/free-mode";
-
 import { toast } from "react-toastify";
 import { addToCart } from "@/services/cartService";
 import { getProductById } from "@/services/productService";
 import { getProductRatingSummary } from "@/services/reviewService";
-
 import ProductComments from "@/components/ProductComment";
 import ProductCard from "@/components/Card/ProductCard";
+import FavoriteButton from "@/components/FavoriteButton";
 import { Product } from "@/types/types";
 
 const BACKEND_HOST = process.env.NEXT_PUBLIC_HOST_URL;
@@ -31,7 +29,6 @@ interface ProductDetailResponse {
 export default function ProductDetailPage() {
   const router = useRouter();
   const { id } = useParams<{ id: string }>();
-
   const [productData, setProductData] = useState<ProductDetailResponse | null>(null);
   const [ratingData, setRatingData] = useState<{
     average: number;
@@ -49,10 +46,7 @@ export default function ProductDetailPage() {
         if (success) {
           setProductData(body.data);
           const viewed: Product[] = JSON.parse(localStorage.getItem("recentlyViewed") || "[]");
-          const updated = [
-            body.data.product,
-            ...viewed.filter((p) => p.sku !== body.data.product.sku),
-          ].slice(0, 10);
+          const updated = [body.data.product, ...viewed.filter((p) => p.sku !== body.data.product.sku)].slice(0, 10);
           localStorage.setItem("recentlyViewed", JSON.stringify(updated));
         }
       } catch (err) {
@@ -94,29 +88,19 @@ export default function ProductDetailPage() {
 
   if (loading)
     return <div className="min-h-screen flex items-center justify-center">Đang tải sản phẩm...</div>;
-
   if (!productData)
     return <div className="min-h-screen flex items-center justify-center text-red-600">Sản phẩm không tồn tại</div>;
 
   const { product, similarProducts } = productData;
-
-  const slideImages: string[] = [
-    ...(product.avatar ? [product.avatar] : []),
-    ...(product.images?.map((img) => img.url) || []),
-  ];
-
-  const recentlyViewed: Product[] = JSON.parse(localStorage.getItem("recentlyViewed") || "[]")
-    .filter((p: Product) => p.sku !== product.sku);
-
+  const slideImages: string[] = [...(product.avatar ? [product.avatar] : []), ...(product.images?.map((img) => img.url) || [])];
+  const recentlyViewed: Product[] = JSON.parse(localStorage.getItem("recentlyViewed") || "[]").filter((p: Product) => p.sku !== product.sku);
   const handleDecrease = () => quantity > 1 && setQuantity(quantity - 1);
   const handleIncrease = () => quantity < product.stock && setQuantity(quantity + 1);
 
   return (
     <div className="max-w-7xl mx-auto px-4 py-12">
       <nav className="mb-10 text-gray-600">
-        <Link href="/">Trang chủ</Link> /{" "}
-        <Link href={`/danh-muc/${product.genre}`}>{product.genre}</Link> /{" "}
-        <b>{product.name}</b>
+        <Link href="/">Trang chủ</Link> / <Link href={`/danh-muc/${product.genre}`}>{product.genre}</Link> / <b>{product.name}</b>
       </nav>
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 mb-20">
@@ -132,7 +116,6 @@ export default function ProductDetailPage() {
               </SwiperSlide>
             ))}
           </Swiper>
-
           {slideImages.length > 1 && (
             <Swiper
               onSwiper={setThumbsSwiper}
@@ -153,20 +136,21 @@ export default function ProductDetailPage() {
         </div>
 
         <div>
-          <h1 className="text-3xl font-bold mb-4">{product.name}</h1>
+          <div className="flex items-start justify-between">
+            <h1 className="text-3xl font-bold mb-4">{product.name}</h1>
+            <FavoriteButton product={product} />
+          </div>
 
           <div className="flex items-end gap-4 mb-6">
             <span className="text-3xl text-red-600 font-bold">{product.price.toLocaleString("vi-VN")}₫</span>
             {product.originalPrice && product.originalPrice > product.price && (
-              <span className="text-xl text-gray-400 line-through">
-                {product.originalPrice.toLocaleString("vi-VN")}₫
-              </span>
+              <span className="text-xl text-gray-400 line-through">{product.originalPrice.toLocaleString("vi-VN")}₫</span>
             )}
           </div>
 
           <div className="mb-4 inline-block px-4 py-2 bg-green-100 text-green-800 font-medium border border-green-300 rounded-lg">
-  Còn {product.stock} sản phẩm
-</div>
+            Còn {product.stock} sản phẩm
+          </div>
 
           <p className="mb-6 text-gray-700">{product.description || "Chưa có mô tả"}</p>
 
@@ -175,42 +159,13 @@ export default function ProductDetailPage() {
               <div className="flex items-center gap-4">
                 <span className="text-base font-medium text-gray-700">Số lượng:</span>
                 <div className="flex items-center border-2 border-gray-300 rounded-xl overflow-hidden">
-                  <button
-                    onClick={handleDecrease}
-                    disabled={quantity === 1}
-                    className="w-12 h-12 flex items-center justify-center text-xl hover:bg-gray-100 disabled:opacity-50 disabled:cursor-not-allowed transition"
-                  >
-                    −
-                  </button>
+                  <button onClick={handleDecrease} disabled={quantity === 1} className="w-12 h-12 flex items-center justify-center text-xl hover:bg-gray-100 disabled:opacity-50 disabled:cursor-not-allowed transition">−</button>
                   <span className="w-16 text-center text-lg font-semibold">{quantity}</span>
-                  <button
-                    onClick={handleIncrease}
-                    disabled={quantity >= product.stock}
-                    className="w-12 h-12 flex items-center justify-center text-xl hover:bg-gray-100 disabled:opacity-50 disabled:cursor-not-allowed transition"
-                  >
-                    +
-                  </button>
+                  <button onClick={handleIncrease} disabled={quantity >= product.stock} className="w-12 h-12 flex items-center justify-center text-xl hover:bg-gray-100 disabled:opacity-50 disabled:cursor-not-allowed transition">+</button>
                 </div>
               </div>
 
-              <button
-                onClick={() => handleAddToCart(product)}
-                className="w-full py-4 px-8 bg-gradient-to-r from-orange-500 to-orange-600 hover:from-orange-600 hover:to-orange-700 text-white text-lg font-semibold rounded-xl shadow-md transition-all transform hover:scale-105 active:scale-100 disabled:opacity-60 disabled:cursor-not-allowed flex items-center justify-center gap-3"
-              >
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  className="h-6 w-6"
-                  fill="none"
-                  viewBox="0 0 24 24"
-                  stroke="currentColor"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z"
-                  />
-                </svg>
+              <button onClick={() => handleAddToCart(product)} className="w-full py-4 px-8 bg-gradient-to-r from-orange-500 to-orange-600 hover:from-orange-600 hover:to-orange-700 text-white text-lg font-semibold rounded-xl shadow-md transition-all transform hover:scale-105 active:scale-100 flex items-center justify-center gap-3">
                 Thêm vào giỏ hàng
               </button>
             </div>
@@ -243,9 +198,7 @@ export default function ProductDetailPage() {
       {ratingData && (
         <section className="border-t pt-16">
           <h2 className="text-2xl font-bold mb-6">Đánh giá sản phẩm</h2>
-          <p>
-            ⭐ {ratingData.average} / 5 ({ratingData.total} đánh giá)
-          </p>
+          <p>⭐ {ratingData.average} / 5 ({ratingData.total} đánh giá)</p>
         </section>
       )}
 

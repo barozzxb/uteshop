@@ -10,6 +10,7 @@ import {
   Edit3,
   ShoppingCart,
   Grid,
+  Heart,
 } from "lucide-react";
 
 interface UserInfo {
@@ -58,7 +59,7 @@ export default function NavBar() {
     <nav className="sticky top-0 z-50 border-b bg-white/80 backdrop-blur-xl">
       <div className="max-w-7xl mx-auto px-6 h-16 flex items-center justify-between">
         {/* Logo */}
-         <Link href="/user/home" className="flex items-center gap-3">
+        <Link href="/user/home" className="flex items-center gap-3">
           <div className="w-10 h-10 bg-linear-to-br from-blue-600 to-violet-600 rounded-xl flex items-center justify-center text-white font-bold text-lg">
             UTE
           </div>
@@ -132,6 +133,12 @@ export default function NavBar() {
                     label="Chỉnh sửa hồ sơ"
                   />
 
+                  <DropdownItem
+                    href="/user/favorites"
+                    icon={<Heart />}
+                    label="Sản phẩm yêu thích"
+                  />
+
                   <button
                     onClick={() => {
                       localStorage.clear();
@@ -153,7 +160,6 @@ export default function NavBar() {
 }
 
 /* ===== UI helper components ===== */
-
 function NavItem({
   href,
   icon,

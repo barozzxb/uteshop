@@ -14,5 +14,7 @@ import Link from "next/link";
     </h3>
   </Link>
 
+  
+
   <p className="text-red-500">{product.price} đ</p>
 </div>;
