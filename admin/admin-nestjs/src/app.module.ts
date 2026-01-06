@@ -6,6 +6,13 @@ import { MongooseModule } from '@nestjs/mongoose';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { AdminsModule } from './admins/admins.module';
 import { AuthModule } from './auth/auth.module';
+import { ProductsModule } from './products/products.module';
+import { GenresModule } from './genres/genres.module';
+import { UsersModule } from './users/users.module';
+import { OrdersModule } from './orders/orders.module';
+import { DashboardController } from './dashboard/dashboard.controller';
+import { DashboardService } from './dashboard/dashboard.service';
+import { DashboardModule } from './dashboard/dashboard.module';
 
 @Module({
   imports: [ConfigModule.forRoot({ isGlobal: true }),
@@ -17,8 +24,13 @@ import { AuthModule } from './auth/auth.module';
     inject: [ConfigService],
   }),
   AdminsModule,
-  AuthModule,],
-  controllers: [AppController],
-  providers: [AppService],
+  AuthModule,
+  ProductsModule,
+  GenresModule,
+  UsersModule,
+  OrdersModule,
+  DashboardModule,],
+  controllers: [AppController, DashboardController],
+  providers: [AppService, DashboardService],
 })
 export class AppModule { }
