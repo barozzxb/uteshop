@@ -1,1 +1,0 @@
-//type for data in project
