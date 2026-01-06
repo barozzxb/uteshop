@@ -9,7 +9,9 @@
     "lint": "eslint"
   },
   "dependencies": {
+    "@heroicons/react": "^2.2.0",
     "axios": "^1.13.2",
+    "heroicons": "^2.2.0",
     "swiper": "^12.0.3"
   },
   "devDependencies": {

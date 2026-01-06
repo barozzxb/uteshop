@@ -3,7 +3,15 @@
 import Image from "next/image";
 import Link from "next/link";
 import { useState, useEffect, useRef } from "react";
-import { ChevronDown, Package, LogOut, Edit3, ShoppingCart, Grid } from "lucide-react";
+import {
+  ChevronDown,
+  Package,
+  LogOut,
+  Edit3,
+  ShoppingCart,
+  Grid,
+  Heart,
+} from "lucide-react";
 
 interface UserInfo {
   firstname?: string;
@@ -23,7 +31,8 @@ export default function NavBar() {
   };
 
   const fullName = user
-    ? `${user.firstname || ""} ${user.lastname || ""}`.trim() || user.email.split("@")[0]
+    ? `${user.firstname || ""} ${user.lastname || ""}`.trim() ||
+    user.email.split("@")[0]
     : "Tài khoản";
 
   useEffect(() => {
@@ -47,7 +56,7 @@ export default function NavBar() {
   }, []);
 
   return (
-    <nav className="bg-white border-b sticky top-0 z-60 shadow-sm">
+    <nav className="sticky top-0 z-50 border-b bg-white/80 backdrop-blur-xl">
       <div className="max-w-7xl mx-auto px-6 h-16 flex items-center justify-between">
         {/* Logo */}
         <Link href="/user/home" className="flex items-center gap-3">
@@ -59,71 +68,85 @@ export default function NavBar() {
           </span>
         </Link>
 
-        {/* Main links */}
-        <div className="flex items-center gap-4">
-          <Link
-            href="/products"
-            className="flex items-center gap-1 px-3 py-2 rounded hover:bg-gray-100 transition"
-          >
-            <Grid className="w-5 h-5" /> Sản phẩm
-          </Link>
+        {/* Navigation */}
+        <div className="flex items-center gap-2">
+          <NavItem href="/products" icon={<Grid />} label="Sản phẩm" />
+
           {user && (
             <>
-              <Link
+              <NavItem
                 href="/user/cart"
-                className="flex items-center gap-1 px-3 py-2 rounded hover:bg-gray-100 transition"
-              >
-                <ShoppingCart className="w-5 h-5" /> Giỏ hàng
-              </Link>
-              <Link
+                icon={<ShoppingCart />}
+                label="Giỏ hàng"
+              />
+              <NavItem
                 href="/user/order"
-                className="flex items-center gap-1 px-3 py-2 rounded hover:bg-gray-100 transition"
-              >
-                <Package className="w-5 h-5" /> Đơn hàng
-              </Link>
+                icon={<Package />}
+                label="Đơn hàng"
+              />
             </>
           )}
 
-          {/* Avatar dropdown */}
-          <div className="relative" ref={ref}>
+          {/* User dropdown */}
+          <div className="relative ml-2" ref={ref}>
             <button
               onClick={() => setOpen(!open)}
-              className="flex items-center gap-3 px-3 py-2 rounded-2xl hover:bg-gray-50 transition"
+              className="flex items-center gap-3 pl-2 pr-3 py-2 rounded-full hover:bg-gray-100 transition"
             >
-              <div className="w-10 h-10 rounded-full ring-4 ring-blue-100 shadow-md overflow-hidden">
+              <div className="w-10 h-10 rounded-full overflow-hidden ring-2 ring-blue-200 shadow-sm">
                 {user?.avatar ? (
-                  <Image src={user.avatar} alt="" width={40} height={40} className="object-cover" />
+                  <Image
+                    src={user.avatar}
+                    alt=""
+                    width={40}
+                    height={40}
+                    className="object-cover"
+                  />
                 ) : (
-                  <div className="w-full h-full bg-linear-to-br from-blue-500 to-violet-500 text-white flex items-center justify-center font-bold text-lg">
+                  <div className="w-full h-full bg-gradient-to-br from-blue-500 to-violet-500 text-white flex items-center justify-center font-bold">
                     {getInitial()}
                   </div>
                 )}
               </div>
-              <span className="font-semibold">{fullName}</span>
-              <ChevronDown className={`w-5 transition ${open ? "rotate-180" : ""}`} />
+
+              <span className="hidden sm:block font-semibold text-gray-700">
+                {fullName}
+              </span>
+              <ChevronDown
+                className={`w-4 h-4 text-gray-500 transition ${open ? "rotate-180" : ""
+                  }`}
+              />
             </button>
 
             {open && (
-              <div className="absolute right-0 mt-3 w-64 bg-white rounded-2xl shadow-2xl border">
-                <div className="p-5 bg-linear-to-r from-blue-600 to-violet-600 text-white rounded-t-2xl">
+              <div className="absolute right-0 mt-3 w-72 bg-white rounded-2xl shadow-2xl border overflow-hidden animate-fade-in">
+                <div className="px-5 py-4 bg-gradient-to-r from-blue-600 to-violet-600 text-white">
                   <p className="font-bold text-lg">{fullName}</p>
                   <p className="text-sm opacity-90">{user?.email}</p>
                 </div>
-                <div className="p-3 space-y-1">
-                  <Link
+
+                <div className="p-2">
+                  <DropdownItem
                     href="/user/profile"
-                    className="flex items-center gap-3 px-4 py-3 hover:bg-gray-100 rounded-xl"
-                  >
-                    <Edit3 className="w-5 h-5" /> Chỉnh sửa hồ sơ
-                  </Link>
+                    icon={<Edit3 />}
+                    label="Chỉnh sửa hồ sơ"
+                  />
+
+                  <DropdownItem
+                    href="/user/favorites"
+                    icon={<Heart />}
+                    label="Sản phẩm yêu thích"
+                  />
+
                   <button
                     onClick={() => {
                       localStorage.clear();
                       window.location.href = "/login";
                     }}
-                    className="w-full flex items-center gap-3 px-4 py-3 hover:bg-red-50 text-red-600 rounded-xl text-left"
+                    className="w-full flex items-center gap-3 px-4 py-3 rounded-xl text-red-600 hover:bg-red-50 transition text-left"
                   >
-                    <LogOut className="w-5 h-5" /> Đăng xuất
+                    <LogOut className="w-5 h-5" />
+                    Đăng xuất
                   </button>
                 </div>
               </div>
@@ -132,5 +155,46 @@ export default function NavBar() {
         </div>
       </div>
     </nav>
+  );
+}
+
+/* ===== UI helper components ===== */
+function NavItem({
+  href,
+  icon,
+  label,
+}: {
+  href: string;
+  icon: React.ReactNode;
+  label: string;
+}) {
+  return (
+    <Link
+      href={href}
+      className="flex items-center gap-2 px-4 py-2 rounded-xl text-gray-700 hover:bg-gray-100 hover:text-blue-600 transition font-medium"
+    >
+      <span className="w-5 h-5">{icon}</span>
+      {label}
+    </Link>
+  );
+}
+
+function DropdownItem({
+  href,
+  icon,
+  label,
+}: {
+  href: string;
+  icon: React.ReactNode;
+  label: string;
+}) {
+  return (
+    <Link
+      href={href}
+      className="flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-gray-100 transition"
+    >
+      <span className="w-5 h-5 text-gray-600">{icon}</span>
+      <span className="font-medium text-gray-700">{label}</span>
+    </Link>
   );
 }
